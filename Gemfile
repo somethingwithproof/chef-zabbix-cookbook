@@ -11,7 +11,7 @@ group :development do
   gem 'cookstyle'
   gem 'kitchen-dokken'
   gem 'kitchen-inspec'
-  #gem "ruby-shadow" # For user resources
+  # gem "ruby-shadow" # For user resources
   gem 'test-kitchen'
 end
 

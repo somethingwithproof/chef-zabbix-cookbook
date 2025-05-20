@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # InSpec test for Zabbix agent installation
 
 title 'Verify Zabbix Agent Installation'
@@ -19,9 +21,9 @@ describe file('/etc/zabbix/zabbix_agentd.conf') do
   it { should be_file }
   it { should be_readable.by_user('zabbix') }
   its('mode') { should cmp '0640' }
-  its('content') { should match /Server=127.0.0.1/ }
-  its('content') { should match /ServerActive=127.0.0.1/ }
-  its('content') { should match /Hostname=/ }
+  its('content') { should match(/Server=127.0.0.1/) }
+  its('content') { should match(/ServerActive=127.0.0.1/) }
+  its('content') { should match(/Hostname=/) }
 end
 
 # Check for agent include directory
@@ -57,14 +59,14 @@ describe service('zabbix-agent') do
 end
 
 # Check for zabbix agent port
-describe port(10050) do
+describe port(10_050) do
   it { should be_listening }
 end
 
 # Check for zabbix agent process
 describe processes('zabbix_agentd') do
   its('users') { should eq ['zabbix'] }
-  its('list.length') { should be > 0 }
+  its('list.length') { should be.positive? }
 end
 
 # Check for agent binary

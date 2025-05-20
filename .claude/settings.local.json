@@ -22,7 +22,15 @@
       "Bash(git filter-branch:*)",
       "Bash(gh pr create:*)",
       "Bash(gh pr merge:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(gh pr checks:*)",
+      "Bash(git fetch:*)",
+      "Bash(git pull:*)",
+      "Bash(git rebase:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(chmod:*)",
+      "Bash(./setup_httpd_repo.sh)",
+      "Bash(./setup_nginx_repo.sh:*)"
     ],
     "deny": []
   }

@@ -18,8 +18,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# frozen_string_literal: true
-
 #
 # Cookbook:: zabbix
 # Recipe:: default
@@ -83,17 +81,17 @@ if platform_family?('rhel', 'fedora', 'amazon')
     action :install
     not_if 'getenforce | grep -i disabled'
   end
-  
+
   selinux_fcontext '/etc/zabbix(/.*)?' do
     secontext 'etc_t'
     not_if 'getenforce | grep -i disabled'
   end
-  
+
   selinux_fcontext '/var/log/zabbix(/.*)?' do
     secontext 'zabbix_log_t'
     not_if 'getenforce | grep -i disabled'
   end
-  
+
   selinux_fcontext '/var/run/zabbix(/.*)?' do
     secontext 'zabbix_var_run_t'
     not_if 'getenforce | grep -i disabled'
@@ -131,7 +129,7 @@ end
 if node['zabbix']['server']['enabled']
   # Setup database first
   include_recipe 'zabbix::database'
-  
+
   # Install and configure Zabbix server
   zabbix_server 'zabbix_server' do
     version node['zabbix']['server']['version']
@@ -219,12 +217,12 @@ if platform_family?('rhel', 'fedora', 'amazon')
       secontext 'zabbix_port_t'
       not_if 'getenforce | grep -i disabled'
     end
-    
+
     selinux_boolean 'zabbix_can_network' do
       value true
       not_if 'getenforce | grep -i disabled'
     end
-    
+
     # Database configuration
     case node['zabbix']['server']['database']['type']
     when 'postgresql'
@@ -248,7 +246,7 @@ if platform_family?('rhel', 'fedora', 'amazon')
       value true
       not_if 'getenforce | grep -i disabled'
     end
-    
+
     selinux_boolean 'httpd_can_network_connect_db' do
       value true
       not_if 'getenforce | grep -i disabled'
