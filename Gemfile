@@ -10,7 +10,7 @@ group :development do
   gem 'kitchen-inspec'
   gem 'kitchen-dokken'
   gem 'test-kitchen'
-  gem 'ruby-shadow' # For user resources
+  # gem 'ruby-shadow' # For user resources - requires compilation
 end
 
 group :test do

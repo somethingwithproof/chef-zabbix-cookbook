@@ -14,7 +14,7 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.3'
+        ruby-version: '3.2'
         bundler-cache: true
     - name: Install Chef
       run: gem install chef-cli
@@ -54,7 +54,7 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.3'
+        ruby-version: '3.2'
         bundler-cache: true
     - name: Install Chef
       run: gem install chef-cli
@@ -95,7 +95,7 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.3'
+        ruby-version: '3.2'
         bundler-cache: true
     - name: Install Chef
       run: gem install chef-cli
@@ -136,7 +136,7 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.3'
+        ruby-version: '3.2'
         bundler-cache: true
     - name: Install Chef
       run: gem install chef-cli
