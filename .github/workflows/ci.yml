@@ -25,12 +25,12 @@ jobs:
     - name: Run ChefSpec tests with coverage
       run: bundle exec rspec --format documentation --format RspecJunitFormatter --out rspec.xml
     - name: Upload test results
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: rspec-results
         path: rspec.xml
     - name: Upload coverage results
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: coverage-results
         path: coverage/
@@ -57,7 +57,7 @@ jobs:
     - name: Install dependencies
       run: bundle install
     - name: Set up Docker
-      uses: docker/setup-buildx-action@v4
+      uses: docker/setup-buildx-action@v3
     - name: Free disk space
       run: |
         sudo apt-get clean
@@ -69,7 +69,7 @@ jobs:
         bundle exec kitchen test agent-${{ matrix.os }} --destroy=always
     - name: Upload kitchen logs on failure
       if: failure()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: kitchen-logs-agent-${{ matrix.os }}
         path: .kitchen/logs/
@@ -96,7 +96,7 @@ jobs:
     - name: Install dependencies
       run: bundle install
     - name: Set up Docker
-      uses: docker/setup-buildx-action@v4
+      uses: docker/setup-buildx-action@v3
     - name: Free disk space
       run: |
         sudo apt-get clean
@@ -108,7 +108,7 @@ jobs:
         bundle exec kitchen test server-postgresql-${{ matrix.os }} --destroy=always
     - name: Upload kitchen logs on failure
       if: failure()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: kitchen-logs-postgresql-${{ matrix.os }}
         path: .kitchen/logs/
@@ -135,7 +135,7 @@ jobs:
     - name: Install dependencies
       run: bundle install
     - name: Set up Docker
-      uses: docker/setup-buildx-action@v4
+      uses: docker/setup-buildx-action@v3
     - name: Free disk space
       run: |
         sudo apt-get clean
@@ -147,7 +147,7 @@ jobs:
         bundle exec kitchen test server-mysql-${{ matrix.os }} --destroy=always
     - name: Upload kitchen logs on failure
       if: failure()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: kitchen-logs-mysql-${{ matrix.os }}
         path: .kitchen/logs/
