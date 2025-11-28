@@ -38,13 +38,13 @@ jobs:
       run: bundle exec rspec --format documentation --format RspecJunitFormatter --out rspec.xml
     - name: Upload test results
       if: always()
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v4
       with:
         name: rspec-results
         path: rspec.xml
     - name: Upload coverage results
       if: always()
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v4
       with:
         name: coverage-results
         path: coverage/
@@ -82,7 +82,7 @@ jobs:
         bundle exec kitchen test agent-${{ matrix.os }} --destroy=always
     - name: Upload kitchen logs on failure
       if: failure()
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v4
       with:
         name: kitchen-logs-agent-${{ matrix.os }}
         path: .kitchen/logs/
@@ -120,7 +120,7 @@ jobs:
         bundle exec kitchen test server-postgresql-${{ matrix.os }} --destroy=always
     - name: Upload kitchen logs on failure
       if: failure()
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v4
       with:
         name: kitchen-logs-postgresql-${{ matrix.os }}
         path: .kitchen/logs/
@@ -158,7 +158,7 @@ jobs:
         bundle exec kitchen test server-mysql-${{ matrix.os }} --destroy=always
     - name: Upload kitchen logs on failure
       if: failure()
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v4
       with:
         name: kitchen-logs-mysql-${{ matrix.os }}
         path: .kitchen/logs/
