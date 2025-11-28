@@ -18,7 +18,7 @@ group :test do
   gem 'rspec_junit_formatter'
   gem 'simplecov', '~> 0.22'
   gem 'simplecov-console', '~> 0.9'
-  gem 'inspec', '~> 7.0'
+  gem 'inspec', '~> 6.0'
   # Remove problematic dependencies that cause conflicts
 end
 
