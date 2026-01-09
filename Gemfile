@@ -14,7 +14,9 @@ gem 'chef-cli', '~> 5.6'
 end
 
 group :test do
-  # Let chefspec manage rspec version to avoid compatibility issues
+  # Pin RSpec to version compatible with ChefSpec 9.3
+  gem 'rspec', '~> 3.12.0'
+  gem 'rspec-expectations', '~> 3.12.0'
   gem 'rspec_junit_formatter'
   gem 'simplecov', '~> 0.22'
   gem 'simplecov-console', '~> 0.9'
