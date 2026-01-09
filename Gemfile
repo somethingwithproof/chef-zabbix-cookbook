@@ -20,7 +20,9 @@ group :test do
   gem 'rspec_junit_formatter'
   gem 'simplecov', '~> 0.22'
   gem 'simplecov-console', '~> 0.9'
-  # InSpec is managed by kitchen-inspec, don't specify it directly
+  # Required by postgresql cookbook
+  gem 'deepsort', '~> 0.5.0'
+  gem 'inifile', '~> 3.0'
 end
 
 group :docs do
