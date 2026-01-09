@@ -20,7 +20,7 @@ group :test do
   gem 'rspec_junit_formatter'
   gem 'simplecov', '~> 0.22'
   gem 'simplecov-console', '~> 0.9'
-  gem 'inspec', '~> 7.0'
+  # InSpec is managed by kitchen-inspec, don't specify it directly
 end
 
 group :docs do
