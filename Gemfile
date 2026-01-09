@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'chef', '~> 18.0'
+gem 'chef', '~> 18.8'
 gem 'berkshelf', '>= 8.0'
 
 group :development do
