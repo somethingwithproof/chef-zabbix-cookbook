@@ -14,12 +14,11 @@ gem 'chef-cli', '~> 5.6'
 end
 
 group :test do
-  gem 'rspec', '~> 3.12'
+  # Let chefspec manage rspec version to avoid compatibility issues
   gem 'rspec_junit_formatter'
   gem 'simplecov', '~> 0.22'
   gem 'simplecov-console', '~> 0.9'
-  gem 'inspec', '~> 6.0'
-  # Remove problematic dependencies that cause conflicts
+  gem 'inspec', '~> 7.0'
 end
 
 group :docs do
