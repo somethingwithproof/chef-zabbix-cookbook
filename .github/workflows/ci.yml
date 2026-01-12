@@ -31,9 +31,9 @@ jobs:
         ruby-version: '3.2'
         bundler-cache: true
     - name: Check Ruby syntax
-      run: bundle exec chef exec ruby -c -w $(find . -name "*.rb" -not -path "./vendor/*")
+      run: find . -name "*.rb" -not -path "./vendor/*" -exec ruby -c -w {} \;
     - name: Check Chef syntax with Cookstyle
-      run: bundle exec cookstyle
+      run: bundle exec cookstyle --fail-level error
     - name: Run ChefSpec tests with coverage
       run: bundle exec rspec --format documentation --format RspecJunitFormatter --out rspec.xml
     - name: Upload test results

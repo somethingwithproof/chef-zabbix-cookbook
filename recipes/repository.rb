@@ -18,8 +18,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-unified_mode true
-
 # Configure repositories for Zabbix packages
 case node['platform_family']
 when 'rhel', 'amazon', 'fedora'
