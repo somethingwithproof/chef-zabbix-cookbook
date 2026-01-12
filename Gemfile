@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'chef', '~> 18.0'
+gem 'chef', '~> 18.8'
 gem 'berkshelf', '>= 8.0'
 
 group :development do
@@ -14,12 +14,15 @@ gem 'chef-cli', '~> 5.6'
 end
 
 group :test do
-  gem 'rspec', '~> 3.12'
+  # Pin RSpec to version compatible with ChefSpec 9.3
+  gem 'rspec', '~> 3.12.0'
+  gem 'rspec-expectations', '~> 3.12.0'
   gem 'rspec_junit_formatter'
   gem 'simplecov', '~> 0.22'
   gem 'simplecov-console', '~> 0.9'
-  gem 'inspec', '~> 6.0'
-  # Remove problematic dependencies that cause conflicts
+  # Required by postgresql cookbook
+  gem 'deepsort', '~> 0.5.0'
+  gem 'inifile', '~> 3.0'
 end
 
 group :docs do

@@ -18,10 +18,10 @@ supports 'alma', '>= 8.0'
 
 depends 'build-essential', '>= 8.2'
 depends 'yum-epel', '>= 4.1'
-depends 'apt', '>= 8.0'
+depends 'apt', '>= 7.0'
 depends 'postgresql', '>= 13.0'
-depends 'mysql', '>= 12.0'
-depends 'nginx', '>= 15.0'
+depends 'mysql', '>= 11.0'
+depends 'nginx', '>= 12.0'
 depends 'apache2', '>= 9.0'
 depends 'selinux', '>= 6.0'
 
