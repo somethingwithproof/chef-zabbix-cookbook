@@ -167,6 +167,7 @@ when 'mysql'
   end
 
   # Import schema with more robust error handling
+  # NOTE: Using MYSQL_PWD environment variable for security (avoids password in process list)
   ruby_block 'import_zabbix_mysql_schema' do
     block do
       # Find schema files
@@ -175,14 +176,19 @@ when 'mysql'
       data_file = Dir.glob('/usr/share/doc/zabbix-server-mysql*/data.sql').first
 
       if schema_file && images_file && data_file
+        # Set environment for mysql (secure - password not visible in process list)
+        env = { 'MYSQL_PWD' => node['zabbix']['server']['database']['password'] }
+        db_user = node['zabbix']['server']['database']['user']
+        db_host = node['zabbix']['server']['database']['host']
+        db_name = node['zabbix']['server']['database']['name']
+
         # Check if schema already imported
         cmd = Mixlib::ShellOut.new(
-          "mysql -u#{node['zabbix']['server']['database']['user']} " \
-          "-p#{node['zabbix']['server']['database']['password']} " \
-          "-h#{node['zabbix']['server']['database']['host']} " \
+          "mysql -u#{db_user} -h#{db_host} " \
           "-e 'SELECT COUNT(*) FROM information_schema.tables " \
-          "WHERE table_schema=\"#{node['zabbix']['server']['database']['name']}\" " \
-          "AND table_name=\"users\";'"
+          "WHERE table_schema=\"#{db_name}\" AND table_name=\"users\";'",
+          environment: env,
+          timeout: 60
         )
         cmd.run_command
         tables_exist = cmd.stdout.strip.to_i > 0
@@ -190,10 +196,9 @@ when 'mysql'
         unless tables_exist
           # Import schema
           cmd = Mixlib::ShellOut.new(
-            "mysql -u#{node['zabbix']['server']['database']['user']} " \
-            "-p#{node['zabbix']['server']['database']['password']} " \
-            "-h#{node['zabbix']['server']['database']['host']} " \
-            "#{node['zabbix']['server']['database']['name']} < #{schema_file}"
+            "mysql -u#{db_user} -h#{db_host} #{db_name} < #{schema_file}",
+            environment: env,
+            timeout: 300
           )
           cmd.run_command
           unless cmd.exitstatus.zero?
@@ -203,10 +208,9 @@ when 'mysql'
 
           # Import images
           cmd = Mixlib::ShellOut.new(
-            "mysql -u#{node['zabbix']['server']['database']['user']} " \
-            "-p#{node['zabbix']['server']['database']['password']} " \
-            "-h#{node['zabbix']['server']['database']['host']} " \
-            "#{node['zabbix']['server']['database']['name']} < #{images_file}"
+            "mysql -u#{db_user} -h#{db_host} #{db_name} < #{images_file}",
+            environment: env,
+            timeout: 300
           )
           cmd.run_command
           unless cmd.exitstatus.zero?
@@ -216,10 +220,9 @@ when 'mysql'
 
           # Import data
           cmd = Mixlib::ShellOut.new(
-            "mysql -u#{node['zabbix']['server']['database']['user']} " \
-            "-p#{node['zabbix']['server']['database']['password']} " \
-            "-h#{node['zabbix']['server']['database']['host']} " \
-            "#{node['zabbix']['server']['database']['name']} < #{data_file}"
+            "mysql -u#{db_user} -h#{db_host} #{db_name} < #{data_file}",
+            environment: env,
+            timeout: 300
           )
           cmd.run_command
           unless cmd.exitstatus.zero?

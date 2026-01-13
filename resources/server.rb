@@ -134,9 +134,9 @@ property :service_name, String,
          default: 'zabbix-server',
          description: 'Name of the server service'
 
-property :service_provider, [String, Symbol],
-         default: lazy { Chef::Platform::ServiceHelpers.service_resource_providers.first },
-         description: 'Provider for the server service'
+property :service_provider, [String, Symbol, NilClass],
+         default: nil,
+         description: 'Provider for the server service (auto-detected if nil)'
 
 property :service_enabled, [TrueClass, FalseClass],
          default: true,

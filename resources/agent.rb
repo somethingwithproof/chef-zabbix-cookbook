@@ -90,9 +90,9 @@ property :service_name, String,
          default: 'zabbix-agent',
          description: 'Name of the agent service'
 
-property :service_provider, [String, Symbol],
-         default: lazy { Chef::Platform::ServiceHelpers.service_resource_providers.first },
-         description: 'Provider for the agent service'
+property :service_provider, [String, Symbol, NilClass],
+         default: nil,
+         description: 'Provider for the agent service (auto-detected if nil)'
 
 property :service_enabled, [TrueClass, FalseClass],
          default: true,
