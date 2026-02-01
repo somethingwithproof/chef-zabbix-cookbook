@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # InSpec test for Zabbix agent installation
 
 title 'Verify Zabbix Agent Installation'

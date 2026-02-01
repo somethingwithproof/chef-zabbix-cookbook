@@ -4,13 +4,14 @@ gem 'chef', '~> 18.8'
 gem 'berkshelf', '>= 8.0'
 
 group :development do
-gem 'chef-cli', '~> 5.6'
-  gem 'cookstyle', '~> 8.1'
   gem 'chefspec', '~> 9.3'
-  gem 'kitchen-inspec', '~> 3.0'
+  gem 'cookstyle', '~> 8.1'
   gem 'kitchen-dokken', '~> 2.20'
   gem 'test-kitchen', '~> 4.0'
   gem 'rake', '~> 13.0'
+  # Required by postgresql cookbook dependency
+  gem 'deepsort', '~> 0.5.0'
+  gem 'inifile', '~> 3.0'
 end
 
 group :test do

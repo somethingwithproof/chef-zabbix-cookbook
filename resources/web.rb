@@ -103,16 +103,16 @@ action_class do
   def install_web_package
     # Select package based on database type
     web_package = case new_resource.database_type
-                when 'postgresql'
-                  'zabbix-web-pgsql'
-                when 'mysql'
-                  'zabbix-web-mysql'
-                end
+                  when 'postgresql'
+                    'zabbix-web-pgsql'
+                  when 'mysql'
+                    'zabbix-web-mysql'
+                  end
 
     # Install Zabbix web frontend package
     package web_package do
       action :install
-      options '--enablerepo=zabbix' if %w(rhel amazon).include? node['platform_family']
+      options '--enablerepo=zabbix' if platform_family?('rhel', 'amazon')
     end
 
     # Install PHP packages if needed
@@ -134,7 +134,7 @@ action_class do
 
     package 'zabbix-apache-conf' do
       action :install
-      options '--enablerepo=zabbix' if %w(rhel amazon).include? node['platform_family']
+      options '--enablerepo=zabbix' if platform_family?('rhel', 'amazon')
     end
 
     # Configure Apache virtual host
@@ -211,7 +211,7 @@ action_class do
       recursive true
       action :create
     end
-    
+
     # Create PHP configuration
     template '/etc/zabbix/web/zabbix.conf.php' do
       source 'zabbix.conf.php.erb'
@@ -270,11 +270,11 @@ end
 
 action :remove do
   web_package = case new_resource.database_type
-               when 'postgresql'
-                 'zabbix-web-pgsql'
-               when 'mysql'
-                 'zabbix-web-mysql'
-               end
+                when 'postgresql'
+                  'zabbix-web-pgsql'
+                when 'mysql'
+                  'zabbix-web-mysql'
+                end
 
   package web_package do
     action :remove

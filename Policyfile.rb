@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Policyfile.rb - Describe how you want Chef Infra Client to build your system.
 #
 # For more information on the Policyfile feature, visit
@@ -18,8 +20,8 @@ cookbook 'zabbix', path: '.'
 # Dependencies
 cookbook 'apt'
 cookbook 'yum-epel'
-cookbook 'build-essential'
 cookbook 'postgresql'
 cookbook 'mysql'
 cookbook 'apache2'
 cookbook 'nginx'
+cookbook 'selinux'

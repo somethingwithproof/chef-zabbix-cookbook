@@ -11,7 +11,7 @@ description 'Use the zabbix_agent resource to install and configure Zabbix agent
 property :version, String,
          default: lazy { node['zabbix']['agent']['version'] },
          description: 'The version of Zabbix agent to install'
-         
+
 property :install_method, String,
          equal_to: %w(package source),
          default: 'package',
@@ -54,7 +54,13 @@ property :listen_port, [Integer, String],
 
 property :enable_remote_commands, [Integer, String, TrueClass, FalseClass],
          default: lazy { node['zabbix']['agent']['enable_remote_commands'] },
-         coerce: proc { |v| v.is_a?(TrueClass) ? 1 : v.is_a?(FalseClass) ? 0 : v },
+         coerce: proc { |v|
+           if v.is_a?(TrueClass)
+             1
+           else
+             v.is_a?(FalseClass) ? 0 : v
+           end
+         },
          description: 'Enable remote commands (0,1)'
 
 property :tls_connect, String,
@@ -90,15 +96,15 @@ property :service_name, String,
          default: 'zabbix-agent',
          description: 'Name of the agent service'
 
-property :service_provider, [String, Symbol],
-         default: lazy { Chef::Platform::ServiceHelpers.service_resource_providers.first },
-         description: 'Provider for the agent service'
+property :service_provider, [String, Symbol, NilClass],
+         default: nil,
+         description: 'Provider for the agent service (auto-detected if nil)'
 
-property :service_enabled, [TrueClass, FalseClass],
+property :service_enabled, [true, false],
          default: true,
          description: 'Enable the agent service'
 
-property :service_auto_start, [TrueClass, FalseClass],
+property :service_auto_start, [true, false],
          default: true,
          description: 'Auto-start the agent service'
 
@@ -136,13 +142,13 @@ action_class do
     # Install Zabbix agent package
     package 'zabbix-agent' do
       package_name case node['platform_family']
-                  when 'rhel', 'amazon'
-                    'zabbix-agent'
-                  when 'debian'
-                    'zabbix-agent'
-                  end
+                   when 'rhel', 'amazon'
+                     'zabbix-agent'
+                   when 'debian'
+                     'zabbix-agent'
+                   end
       action :install
-      options '--enablerepo=zabbix' if %w(rhel amazon).include? node['platform_family']
+      options '--enablerepo=zabbix' if platform_family?('rhel', 'amazon')
     end
   end
 
@@ -154,7 +160,7 @@ action_class do
     src_dir = "#{Chef::Config[:file_cache_path]}/zabbix-agent-#{version}"
     install_dir = node['zabbix']['install_dir']
 
-    # Requirements for source build 
+    # Requirements for source build
     build_essential 'install_buildtools' do
       action :install
     end
@@ -200,7 +206,7 @@ action_class do
     end
 
     # Create init script or systemd service file
-    if node['init_package'] == 'systemd'
+    if systemd?
       template '/etc/systemd/system/zabbix-agent.service' do
         source 'zabbix-agent.service.erb'
         owner 'root'
