@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 name 'agent'
 
 default_source :supermarket

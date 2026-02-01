@@ -36,13 +36,15 @@ when 'rhel', 'amazon', 'fedora'
   end
 
   # Create a Zabbix non-supported repository
+  # Note: Zabbix 6.x+ uses a unified repo; the non-supported repo is disabled
+  # by default to avoid makecache failures on missing upstream repos.
   yum_repository 'zabbix-non-supported' do
     description "Zabbix Official Repository non-supported - #{node['kernel']['machine']}"
     baseurl node['zabbix']['repository_uri'].gsub('$basearch', 'non-supported')
     gpgkey node['zabbix']['repository_key']
-    enabled true
+    enabled false
     gpgcheck true
-    make_cache true
+    make_cache false
     metadata_expire '1h'
     action :create
   end
@@ -54,7 +56,9 @@ when 'rhel', 'amazon', 'fedora'
   end
 
 when 'debian'
-  include_recipe 'apt'
+  apt_update 'update' do
+    action :update
+  end
 
   # Install apt-transport-https for HTTPS repo
   package %w(apt-transport-https ca-certificates gnupg curl) do
@@ -65,7 +69,6 @@ when 'debian'
   apt_repository 'zabbix' do
     uri "https://repo.zabbix.com/zabbix/#{node['zabbix']['version']}/#{node['platform']}/"
     components ['main']
-    distribution node['lsb']['codename']
     key node['zabbix']['repository_key']
     cache_rebuild true
     action :add
@@ -75,7 +78,6 @@ when 'debian'
   apt_repository 'zabbix-non-supported' do
     uri "https://repo.zabbix.com/zabbix-non-supported/#{node['zabbix']['version']}/#{node['platform']}/"
     components ['main']
-    distribution node['lsb']['codename']
     key node['zabbix']['repository_key']
     cache_rebuild true
     action :add

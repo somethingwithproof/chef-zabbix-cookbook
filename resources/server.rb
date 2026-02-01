@@ -11,7 +11,7 @@ description 'Use the zabbix_server resource to install and configure Zabbix serv
 property :version, String,
          default: lazy { node['zabbix']['server']['version'] },
          description: 'The version of Zabbix server to install'
-         
+
 property :install_method, String,
          equal_to: %w(package source),
          default: 'package',
@@ -134,15 +134,15 @@ property :service_name, String,
          default: 'zabbix-server',
          description: 'Name of the server service'
 
-property :service_provider, [String, Symbol],
-         default: lazy { Chef::Platform::ServiceHelpers.service_resource_providers.first },
-         description: 'Provider for the server service'
+property :service_provider, [String, Symbol, NilClass],
+         default: nil,
+         description: 'Provider for the server service (auto-detected if nil)'
 
-property :service_enabled, [TrueClass, FalseClass],
+property :service_enabled, [true, false],
          default: true,
          description: 'Enable the server service'
 
-property :service_auto_start, [TrueClass, FalseClass],
+property :service_auto_start, [true, false],
          default: true,
          description: 'Auto-start the server service'
 
@@ -171,16 +171,16 @@ action_class do
   def install_package
     # Select package based on database type
     server_package = case new_resource.database_type
-                    when 'postgresql'
-                      'zabbix-server-pgsql'
-                    when 'mysql'
-                      'zabbix-server-mysql'
-                    end
+                     when 'postgresql'
+                       'zabbix-server-pgsql'
+                     when 'mysql'
+                       'zabbix-server-mysql'
+                     end
 
     # Install the Zabbix server package
     package server_package do
       action :install
-      options '--enablerepo=zabbix' if %w(rhel amazon).include? node['platform_family']
+      options '--enablerepo=zabbix' if platform_family?('rhel', 'amazon')
     end
   end
 
@@ -214,11 +214,11 @@ action_class do
 
     # Configure and make Zabbix server
     db_flags = case new_resource.database_type
-              when 'postgresql'
-                "--with-postgresql=#{node['postgresql']['dir']}"
-              when 'mysql'
-                "--with-mysql"
-              end
+               when 'postgresql'
+                 "--with-postgresql=#{node['postgresql']['dir']}"
+               when 'mysql'
+                 '--with-mysql'
+               end
 
     bash 'install_zabbix_server' do
       cwd src_dir
@@ -246,7 +246,7 @@ action_class do
     end
 
     # Create init script or systemd service file
-    if node['init_package'] == 'systemd'
+    if systemd?
       template '/etc/systemd/system/zabbix-server.service' do
         source 'zabbix-server.service.erb'
         owner 'root'
@@ -382,11 +382,11 @@ action :remove do
   end
 
   server_package = case new_resource.database_type
-                  when 'postgresql'
-                    'zabbix-server-pgsql'
-                  when 'mysql'
-                    'zabbix-server-mysql'
-                  end
+                   when 'postgresql'
+                     'zabbix-server-pgsql'
+                   when 'mysql'
+                     'zabbix-server-mysql'
+                   end
 
   package server_package do
     action :remove
