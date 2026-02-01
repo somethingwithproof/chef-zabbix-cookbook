@@ -36,13 +36,15 @@ when 'rhel', 'amazon', 'fedora'
   end
 
   # Create a Zabbix non-supported repository
+  # Note: Zabbix 6.x+ uses a unified repo; the non-supported repo is disabled
+  # by default to avoid makecache failures on missing upstream repos.
   yum_repository 'zabbix-non-supported' do
     description "Zabbix Official Repository non-supported - #{node['kernel']['machine']}"
     baseurl node['zabbix']['repository_uri'].gsub('$basearch', 'non-supported')
     gpgkey node['zabbix']['repository_key']
-    enabled true
+    enabled false
     gpgcheck true
-    make_cache true
+    make_cache false
     metadata_expire '1h'
     action :create
   end
