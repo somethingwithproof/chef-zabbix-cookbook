@@ -4,7 +4,7 @@ gem 'chef', '~> 18.8'
 gem 'berkshelf', '>= 8.0'
 
 group :development do
-gem 'chef-cli', '~> 5.6'
+  gem 'chef-cli', '~> 5.6'
   gem 'cookstyle', '~> 8.1'
   gem 'chefspec', '~> 9.3'
   gem 'kitchen-inspec', '~> 3.0'

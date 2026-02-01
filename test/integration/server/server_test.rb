@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # InSpec test for Zabbix server installation
 
 title 'Verify Zabbix Server Installation'
@@ -29,7 +31,7 @@ end
 control 'database-connection' do
   impact 1.0
   title 'Verify database connection'
-  
+
   if command('which psql').exit_status == 0
     describe command("PGPASSWORD=zabbix psql -U zabbix -h 127.0.0.1 -d zabbix -c 'SELECT version();'") do
       its('exit_status') { should eq 0 }
@@ -65,7 +67,7 @@ end
 control 'web-frontend' do
   impact 1.0
   title 'Verify Zabbix web frontend installation'
-  
+
   # Check for web server packages
   if os.debian? || os.ubuntu?
     if file('/etc/apache2').exist?

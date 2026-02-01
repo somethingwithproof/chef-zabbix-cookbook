@@ -25,7 +25,7 @@ when 'package'
   # Install Zabbix Java Gateway package
   package 'zabbix-java-gateway' do
     action :install
-    options '--enablerepo=zabbix' if %w(rhel amazon).include? node['platform_family']
+    options '--enablerepo=zabbix' if platform_family?('rhel', 'amazon')
   end
 
 when 'source'
@@ -78,7 +78,7 @@ when 'source'
   end
 
   # Create init script or systemd service file
-  if node['init_package'] == 'systemd'
+  if systemd?
     template '/etc/systemd/system/zabbix-java-gateway.service' do
       source 'zabbix-java-gateway.service.erb'
       owner 'root'

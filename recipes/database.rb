@@ -62,7 +62,7 @@ when 'postgresql'
       if schema_file && images_file && data_file
         # Set environment for psql
         env = { 'PGPASSWORD' => node['zabbix']['server']['database']['password'] }
-        
+
         # Check if schema already imported
         cmd = Mixlib::ShellOut.new(
           "psql -U #{node['zabbix']['server']['database']['user']} " \
@@ -75,7 +75,9 @@ when 'postgresql'
         cmd.run_command
         tables_exist = cmd.stdout.strip.to_i > 0
 
-        unless tables_exist
+        if tables_exist
+          Chef::Log.info('Zabbix PostgreSQL database schema already exists')
+        else
           # Import schema
           cmd = Mixlib::ShellOut.new(
             "psql -U #{node['zabbix']['server']['database']['user']} " \
@@ -87,7 +89,7 @@ when 'postgresql'
           cmd.run_command
           unless cmd.exitstatus.zero?
             Chef::Log.error("Failed to import schema: #{cmd.stderr}")
-            raise "Failed to import Zabbix PostgreSQL schema"
+            raise 'Failed to import Zabbix PostgreSQL schema'
           end
 
           # Import images
@@ -101,7 +103,7 @@ when 'postgresql'
           cmd.run_command
           unless cmd.exitstatus.zero?
             Chef::Log.error("Failed to import images: #{cmd.stderr}")
-            raise "Failed to import Zabbix PostgreSQL images"
+            raise 'Failed to import Zabbix PostgreSQL images'
           end
 
           # Import data
@@ -115,19 +117,17 @@ when 'postgresql'
           cmd.run_command
           unless cmd.exitstatus.zero?
             Chef::Log.error("Failed to import data: #{cmd.stderr}")
-            raise "Failed to import Zabbix PostgreSQL data"
+            raise 'Failed to import Zabbix PostgreSQL data'
           end
 
           Chef::Log.info('Zabbix PostgreSQL database schema imported successfully')
-        else
-          Chef::Log.info('Zabbix PostgreSQL database schema already exists')
         end
       else
         Chef::Log.warn('Zabbix PostgreSQL schema files not found')
       end
     end
     action :run
-    only_if "test -f /usr/sbin/zabbix_server", environment: { 'PATH' => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin' }
+    only_if 'test -f /usr/sbin/zabbix_server', environment: { 'PATH' => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin' }
   end
 
 when 'mysql'
@@ -193,7 +193,9 @@ when 'mysql'
         cmd.run_command
         tables_exist = cmd.stdout.strip.to_i > 0
 
-        unless tables_exist
+        if tables_exist
+          Chef::Log.info('Zabbix MySQL database schema already exists')
+        else
           # Import schema
           cmd = Mixlib::ShellOut.new(
             "mysql -u#{db_user} -h#{db_host} #{db_name} < #{schema_file}",
@@ -203,7 +205,7 @@ when 'mysql'
           cmd.run_command
           unless cmd.exitstatus.zero?
             Chef::Log.error("Failed to import schema: #{cmd.stderr}")
-            raise "Failed to import Zabbix MySQL schema"
+            raise 'Failed to import Zabbix MySQL schema'
           end
 
           # Import images
@@ -215,7 +217,7 @@ when 'mysql'
           cmd.run_command
           unless cmd.exitstatus.zero?
             Chef::Log.error("Failed to import images: #{cmd.stderr}")
-            raise "Failed to import Zabbix MySQL images"
+            raise 'Failed to import Zabbix MySQL images'
           end
 
           # Import data
@@ -227,12 +229,10 @@ when 'mysql'
           cmd.run_command
           unless cmd.exitstatus.zero?
             Chef::Log.error("Failed to import data: #{cmd.stderr}")
-            raise "Failed to import Zabbix MySQL data"
+            raise 'Failed to import Zabbix MySQL data'
           end
 
           Chef::Log.info('Zabbix MySQL database schema imported successfully')
-        else
-          Chef::Log.info('Zabbix MySQL database schema already exists')
         end
       else
         Chef::Log.warn('Zabbix MySQL schema files not found')
@@ -240,7 +240,7 @@ when 'mysql'
     end
     action :run
     sensitive true
-    only_if "test -f /usr/sbin/zabbix_server", environment: { 'PATH' => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin' }
+    only_if 'test -f /usr/sbin/zabbix_server', environment: { 'PATH' => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin' }
   end
 end
 

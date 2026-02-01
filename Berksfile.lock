@@ -1,0 +1,28 @@
+DEPENDENCIES
+  zabbix
+    path: .
+    metadata: true
+
+GRAPH
+  apache2 (9.3.10)
+    yum-epel (>= 0.0.0)
+  apparmor (4.1.13)
+    line (>= 0.0.0)
+  apt (7.7.0)
+  line (4.5.22)
+  mysql (11.1.10)
+    apparmor (>= 0.0.0)
+  nginx (12.3.1)
+  postgresql (13.0.2)
+    yum (>= 7.2)
+  selinux (6.2.4)
+  yum (7.4.21)
+  yum-epel (5.0.9)
+  zabbix (1.0.0)
+    apache2 (>= 9.0)
+    apt (>= 7.0)
+    mysql (>= 11.0)
+    nginx (>= 12.0)
+    postgresql (>= 13.0)
+    selinux (>= 6.0)
+    yum-epel (>= 4.1)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 name 'server'
 
 default_source :supermarket

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 name 'zabbix'
 maintainer 'Thomas Vincent'
 maintainer_email 'thomasvincent@example.com'
@@ -15,8 +17,6 @@ supports 'redhat', '>= 9.0'
 supports 'rocky', '>= 9.0'
 supports 'almalinux', '>= 9.0'
 supports 'amazon', '>= 2023.0'
-
-depends 'build-essential', '>= 8.2'
 depends 'yum-epel', '>= 4.1'
 depends 'apt', '>= 7.0'
 depends 'postgresql', '>= 13.0'
@@ -24,9 +24,3 @@ depends 'mysql', '>= 11.0'
 depends 'nginx', '>= 12.0'
 depends 'apache2', '>= 9.0'
 depends 'selinux', '>= 6.0'
-
-provides 'zabbix::default'
-provides 'zabbix::agent'
-provides 'zabbix::server'
-provides 'zabbix::web'
-provides 'zabbix::database'

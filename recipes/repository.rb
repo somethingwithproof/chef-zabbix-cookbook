@@ -54,7 +54,9 @@ when 'rhel', 'amazon', 'fedora'
   end
 
 when 'debian'
-  include_recipe 'apt'
+  apt_update 'update' do
+    action :update
+  end
 
   # Install apt-transport-https for HTTPS repo
   package %w(apt-transport-https ca-certificates gnupg curl) do
@@ -65,7 +67,6 @@ when 'debian'
   apt_repository 'zabbix' do
     uri "https://repo.zabbix.com/zabbix/#{node['zabbix']['version']}/#{node['platform']}/"
     components ['main']
-    distribution node['lsb']['codename']
     key node['zabbix']['repository_key']
     cache_rebuild true
     action :add
@@ -75,7 +76,6 @@ when 'debian'
   apt_repository 'zabbix-non-supported' do
     uri "https://repo.zabbix.com/zabbix-non-supported/#{node['zabbix']['version']}/#{node['platform']}/"
     components ['main']
-    distribution node['lsb']['codename']
     key node['zabbix']['repository_key']
     cache_rebuild true
     action :add
