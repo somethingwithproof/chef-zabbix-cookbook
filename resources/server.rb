@@ -44,7 +44,7 @@ property :database_password, String,
          sensitive: true,
          description: 'Database password for Zabbix server'
 
-property :database_socket, String,
+property :database_socket, [String, NilClass],
          default: lazy { node['zabbix']['server']['database']['socket'] },
          description: 'Database socket path'
 
@@ -52,7 +52,7 @@ property :database_schema, String,
          default: lazy { node['zabbix']['server']['database']['schema'] },
          description: 'Database schema name (PostgreSQL only)'
 
-property :database_tls_connect, String,
+property :database_tls_connect, [String, NilClass],
          default: lazy { node['zabbix']['server']['database']['tls_connect'] },
          description: 'Database TLS connection mode'
 
@@ -117,15 +117,15 @@ property :start_discoverers, [Integer, String],
          default: lazy { node['zabbix']['server']['start_discoverers'] },
          description: 'Number of discoverer processes to start'
 
-property :tls_cert_file, String,
+property :tls_cert_file, [String, NilClass],
          default: lazy { node['zabbix']['server']['tls_cert_file'] },
          description: 'Full path to TLS certificate file'
 
-property :tls_key_file, String,
+property :tls_key_file, [String, NilClass],
          default: lazy { node['zabbix']['server']['tls_key_file'] },
          description: 'Full path to TLS key file'
 
-property :tls_ca_file, String,
+property :tls_ca_file, [String, NilClass],
          default: lazy { node['zabbix']['server']['tls_ca_file'] },
          description: 'Full path to TLS CA file'
 

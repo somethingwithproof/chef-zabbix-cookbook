@@ -63,11 +63,11 @@ property :enable_remote_commands, [Integer, String, TrueClass, FalseClass],
          },
          description: 'Enable remote commands (0,1)'
 
-property :tls_connect, String,
+property :tls_connect, [String, NilClass],
          default: lazy { node['zabbix']['agent']['tls_connect'] },
          description: 'TLS connection mode for active checks'
 
-property :tls_accept, String,
+property :tls_accept, [String, NilClass],
          default: lazy { node['zabbix']['agent']['tls_accept'] },
          description: 'TLS connection mode for passive checks'
 
@@ -79,15 +79,15 @@ property :tls_psk_file, [String, NilClass],
          default: lazy { node['zabbix']['agent']['tls_psk_file'] },
          description: 'Full path to TLS PSK file'
 
-property :tls_cert_file, String,
+property :tls_cert_file, [String, NilClass],
          default: lazy { node['zabbix']['agent']['tls_cert_file'] },
          description: 'Full path to TLS certificate file'
 
-property :tls_key_file, String,
+property :tls_key_file, [String, NilClass],
          default: lazy { node['zabbix']['agent']['tls_key_file'] },
          description: 'Full path to TLS key file'
 
-property :tls_ca_file, String,
+property :tls_ca_file, [String, NilClass],
          default: lazy { node['zabbix']['agent']['tls_ca_file'] },
          description: 'Full path to TLS CA file'
 
