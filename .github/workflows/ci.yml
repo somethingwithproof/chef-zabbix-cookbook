@@ -55,11 +55,11 @@ jobs:
     timeout-minutes: 60
     strategy:
       matrix:
-        os: [ubuntu-20.04, ubuntu-22.04, ubuntu-24.04, debian-11, debian-12, rockylinux-8, rockylinux-9, almalinux-9, amazonlinux-2023]
+        os: [ubuntu-2004, ubuntu-2204, ubuntu-2404, debian-11, debian-12, rockylinux-8, rockylinux-9, almalinux-9, amazonlinux-2023]
       fail-fast: false
     env:
       CHEF_LICENSE: accept-no-persist
-      KITCHEN_LOCAL_YAML: .kitchen.dokken.yml
+      KITCHEN_YAML: kitchen.yml
       DOCKER_MEMORY: "2048m"
       DOCKER_CPUS: "2"
     steps:
@@ -77,6 +77,8 @@ jobs:
         sudo rm -rf /usr/share/dotnet
         sudo rm -rf /opt/ghc
         sudo rm -rf /usr/local/share/boost
+    - name: Install Policyfile dependencies
+      run: bundle exec chef-cli install test/policyfiles/agent.rb
     - name: Test Kitchen - Agent
       run: |
         bundle exec kitchen test agent-${{ matrix.os }} --destroy=always
@@ -93,11 +95,11 @@ jobs:
     timeout-minutes: 60
     strategy:
       matrix:
-        os: [ubuntu-20.04, ubuntu-22.04, debian-11, rockylinux-8, amazonlinux-2023]
+        os: [ubuntu-2004, ubuntu-2204, debian-11, rockylinux-8, amazonlinux-2023]
       fail-fast: false
     env:
       CHEF_LICENSE: accept-no-persist
-      KITCHEN_LOCAL_YAML: .kitchen.dokken.yml
+      KITCHEN_YAML: kitchen.yml
       DOCKER_MEMORY: "3072m"
       DOCKER_CPUS: "2"
     steps:
@@ -115,6 +117,8 @@ jobs:
         sudo rm -rf /usr/share/dotnet
         sudo rm -rf /opt/ghc
         sudo rm -rf /usr/local/share/boost
+    - name: Install Policyfile dependencies
+      run: bundle exec chef-cli install test/policyfiles/server.rb
     - name: Test Kitchen - PostgreSQL
       run: |
         bundle exec kitchen test server-postgresql-${{ matrix.os }} --destroy=always
@@ -131,11 +135,11 @@ jobs:
     timeout-minutes: 60
     strategy:
       matrix:
-        os: [ubuntu-20.04, ubuntu-22.04, debian-11, rockylinux-8, amazonlinux-2023]
+        os: [ubuntu-2004, ubuntu-2204, debian-11, rockylinux-8, amazonlinux-2023]
       fail-fast: false
     env:
       CHEF_LICENSE: accept-no-persist
-      KITCHEN_LOCAL_YAML: .kitchen.dokken.yml
+      KITCHEN_YAML: kitchen.yml
       DOCKER_MEMORY: "3072m"
       DOCKER_CPUS: "2"
     steps:
@@ -153,6 +157,8 @@ jobs:
         sudo rm -rf /usr/share/dotnet
         sudo rm -rf /opt/ghc
         sudo rm -rf /usr/local/share/boost
+    - name: Install Policyfile dependencies
+      run: bundle exec chef-cli install test/policyfiles/server.rb
     - name: Test Kitchen - MySQL
       run: |
         bundle exec kitchen test server-mysql-${{ matrix.os }} --destroy=always
