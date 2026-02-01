@@ -9,7 +9,7 @@ gem 'chef-cli', '~> 5.6'
   gem 'chefspec', '~> 9.3'
   gem 'kitchen-inspec', '~> 3.0'
   gem 'kitchen-dokken', '~> 2.20'
-  gem 'test-kitchen', '~> 3.7'
+  gem 'test-kitchen', '~> 4.0'
   gem 'rake', '~> 13.0'
 end
 
