@@ -71,11 +71,11 @@ property :tls_accept, String,
          default: lazy { node['zabbix']['agent']['tls_accept'] },
          description: 'TLS connection mode for passive checks'
 
-property :tls_psk_identity, String,
+property :tls_psk_identity, [String, NilClass],
          default: lazy { node['zabbix']['agent']['tls_psk_identity'] },
          description: 'TLS PSK identity string'
 
-property :tls_psk_file, String,
+property :tls_psk_file, [String, NilClass],
          default: lazy { node['zabbix']['agent']['tls_psk_file'] },
          description: 'Full path to TLS PSK file'
 
