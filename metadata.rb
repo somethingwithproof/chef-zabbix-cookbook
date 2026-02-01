@@ -2,7 +2,7 @@
 
 name 'zabbix'
 maintainer 'Thomas Vincent'
-maintainer_email 'thomasvincent@example.com'
+maintainer_email 'thomasvincent@gmail.com'
 license 'Apache-2.0'
 description 'Installs and configures Zabbix'
 version '1.0.0'
