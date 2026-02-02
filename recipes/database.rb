@@ -18,229 +18,186 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Set up the required database for Zabbix
-case node['zabbix']['server']['database']['type']
+# Set up the required database for Zabbix.
+#
+# Modern mysql/postgresql community cookbooks no longer provide ::server
+# recipes. This recipe installs database servers using native packages
+# and configures them with shell commands for maximum compatibility.
+
+db_type = node['zabbix']['server']['database']['type']
+db_name = node['zabbix']['server']['database']['name']
+db_user = node['zabbix']['server']['database']['user']
+db_password = node['zabbix']['server']['database']['password']
+db_host = node['zabbix']['server']['database']['host']
+
+case db_type
 when 'postgresql'
-  # Include PostgreSQL recipes
-  include_recipe 'postgresql::server'
-  include_recipe 'postgresql::client'
-
-  # Create Zabbix database user with modern resource
-  postgresql_database_user node['zabbix']['server']['database']['user'] do
-    conn_validator_include_password true
-    password node['zabbix']['server']['database']['password']
-    database_name node['zabbix']['server']['database']['name']
-    action :create
-  end
-
-  # Create Zabbix database with modern resource
-  postgresql_database node['zabbix']['server']['database']['name'] do
-    template 'template0'
-    owner node['zabbix']['server']['database']['user']
-    encoding 'UTF-8'
-    locale 'en_US.UTF-8'
-    action :create
-  end
-
-  # Grant privileges to user
-  postgresql_access 'zabbix_local' do
-    access_type 'host'
-    access_db node['zabbix']['server']['database']['name']
-    access_user node['zabbix']['server']['database']['user']
-    access_addr '127.0.0.1/32'
-    access_method 'md5'
-  end
-
-  # Import schema with more robust error handling
-  ruby_block 'import_zabbix_pgsql_schema' do
-    block do
-      # Find schema files
-      schema_file = Dir.glob('/usr/share/doc/zabbix-server-pgsql*/schema.sql').first
-      images_file = Dir.glob('/usr/share/doc/zabbix-server-pgsql*/images.sql').first
-      data_file = Dir.glob('/usr/share/doc/zabbix-server-pgsql*/data.sql').first
-
-      if schema_file && images_file && data_file
-        # Set environment for psql
-        env = { 'PGPASSWORD' => node['zabbix']['server']['database']['password'] }
-
-        # Check if schema already imported
-        cmd = Mixlib::ShellOut.new(
-          "psql -U #{node['zabbix']['server']['database']['user']} " \
-          "-h #{node['zabbix']['server']['database']['host']} " \
-          "-d #{node['zabbix']['server']['database']['name']} " \
-          "-c 'SELECT count(*) FROM information_schema.tables " \
-          "WHERE table_schema = ''public'' AND table_name = ''users'';' -t",
-          environment: env
-        )
-        cmd.run_command
-        tables_exist = cmd.stdout.strip.to_i > 0
-
-        if tables_exist
-          Chef::Log.info('Zabbix PostgreSQL database schema already exists')
-        else
-          # Import schema
-          cmd = Mixlib::ShellOut.new(
-            "psql -U #{node['zabbix']['server']['database']['user']} " \
-            "-h #{node['zabbix']['server']['database']['host']} " \
-            "-d #{node['zabbix']['server']['database']['name']} " \
-            "-f #{schema_file}",
-            environment: env
-          )
-          cmd.run_command
-          unless cmd.exitstatus.zero?
-            Chef::Log.error("Failed to import schema: #{cmd.stderr}")
-            raise 'Failed to import Zabbix PostgreSQL schema'
-          end
-
-          # Import images
-          cmd = Mixlib::ShellOut.new(
-            "psql -U #{node['zabbix']['server']['database']['user']} " \
-            "-h #{node['zabbix']['server']['database']['host']} " \
-            "-d #{node['zabbix']['server']['database']['name']} " \
-            "-f #{images_file}",
-            environment: env
-          )
-          cmd.run_command
-          unless cmd.exitstatus.zero?
-            Chef::Log.error("Failed to import images: #{cmd.stderr}")
-            raise 'Failed to import Zabbix PostgreSQL images'
-          end
-
-          # Import data
-          cmd = Mixlib::ShellOut.new(
-            "psql -U #{node['zabbix']['server']['database']['user']} " \
-            "-h #{node['zabbix']['server']['database']['host']} " \
-            "-d #{node['zabbix']['server']['database']['name']} " \
-            "-f #{data_file}",
-            environment: env
-          )
-          cmd.run_command
-          unless cmd.exitstatus.zero?
-            Chef::Log.error("Failed to import data: #{cmd.stderr}")
-            raise 'Failed to import Zabbix PostgreSQL data'
-          end
-
-          Chef::Log.info('Zabbix PostgreSQL database schema imported successfully')
-        end
-      else
-        Chef::Log.warn('Zabbix PostgreSQL schema files not found')
-      end
+  # Install PostgreSQL server and client packages
+  case node['platform_family']
+  when 'debian'
+    package %w(postgresql postgresql-client) do
+      action :install
     end
-    action :run
+  when 'rhel', 'amazon', 'fedora'
+    package %w(postgresql-server postgresql) do
+      action :install
+    end
+
+    # Initialize PostgreSQL database on RHEL-family systems
+    execute 'postgresql-initdb' do
+      command 'postgresql-setup --initdb || postgresql-setup initdb'
+      not_if { ::File.exist?('/var/lib/pgsql/data/PG_VERSION') }
+    end
+  end
+
+  # Enable and start PostgreSQL service
+  service 'postgresql' do
+    action [:enable, :start]
+  end
+
+  # Configure pg_hba.conf to allow password authentication for the zabbix user
+  execute 'configure_pg_hba' do
+    command <<-BASH
+      PG_HBA=$(find /etc/postgresql /var/lib/pgsql -name pg_hba.conf 2>/dev/null | head -1)
+      if [ -n "$PG_HBA" ]; then
+        if ! grep -q "#{db_user}" "$PG_HBA"; then
+          sed -i "1i host    #{db_name}    #{db_user}    127.0.0.1/32    md5" "$PG_HBA"
+          sed -i "1i local   #{db_name}    #{db_user}                    md5" "$PG_HBA"
+        fi
+      fi
+    BASH
+    notifies :reload, 'service[postgresql]', :immediately
+  end
+
+  # Create Zabbix database user
+  execute 'create_zabbix_pg_user' do
+    command "psql -c \"CREATE ROLE #{db_user} WITH LOGIN PASSWORD '#{db_password}';\""
+    user 'postgres'
+    not_if "psql -tAc \"SELECT 1 FROM pg_roles WHERE rolname='#{db_user}'\" | grep -q 1", user: 'postgres'
+    sensitive true
+  end
+
+  # Create Zabbix database
+  execute 'create_zabbix_pg_database' do
+    command "psql -c \"CREATE DATABASE #{db_name} OWNER #{db_user} ENCODING 'UTF-8' TEMPLATE template0 LC_COLLATE 'en_US.UTF-8' LC_CTYPE 'en_US.UTF-8';\""
+    user 'postgres'
+    not_if "psql -tAc \"SELECT 1 FROM pg_database WHERE datname='#{db_name}'\" | grep -q 1", user: 'postgres'
+  end
+
+  # Import Zabbix schema (modern Zabbix uses create.sql.gz, older uses separate files)
+  execute 'import_zabbix_pgsql_schema' do
+    command lazy {
+      schema_file = Dir.glob('/usr/share/doc/zabbix-server-pgsql*/create.sql.gz').first ||
+                    Dir.glob('/usr/share/doc/zabbix-server-pgsql*/schema.sql').first
+      if schema_file.nil?
+        'echo "No Zabbix schema file found, skipping import"'
+      elsif schema_file.end_with?('.gz')
+        "zcat #{schema_file} | PGPASSWORD='#{db_password}' psql -U #{db_user} -h #{db_host} -d #{db_name}"
+      else
+        "PGPASSWORD='#{db_password}' psql -U #{db_user} -h #{db_host} -d #{db_name} -f #{schema_file}"
+      end
+    }
+    sensitive true
+    not_if "PGPASSWORD='#{db_password}' psql -U #{db_user} -h #{db_host} -d #{db_name} -tAc \"SELECT count(*) FROM information_schema.tables WHERE table_schema='public' AND table_name='users'\" | grep -q '^[1-9]'",
+           environment: { 'PATH' => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin' }
     only_if 'test -f /usr/sbin/zabbix_server', environment: { 'PATH' => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin' }
+  end
+
+  # Import images and data (older Zabbix versions use separate files)
+  %w(images data).each do |file_type|
+    execute "import_zabbix_pgsql_#{file_type}" do
+      command lazy {
+        sql_file = Dir.glob("/usr/share/doc/zabbix-server-pgsql*/#{file_type}.sql").first
+        if sql_file.nil?
+          "echo 'No #{file_type}.sql found (may be combined in create.sql.gz), skipping'"
+        else
+          "PGPASSWORD='#{db_password}' psql -U #{db_user} -h #{db_host} -d #{db_name} -f #{sql_file}"
+        end
+      }
+      sensitive true
+      not_if "PGPASSWORD='#{db_password}' psql -U #{db_user} -h #{db_host} -d #{db_name} -tAc \"SELECT count(*) FROM information_schema.tables WHERE table_schema='public' AND table_name='users'\" | grep -q '^[1-9]'",
+             environment: { 'PATH' => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin' }
+      only_if 'test -f /usr/sbin/zabbix_server', environment: { 'PATH' => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin' }
+    end
   end
 
 when 'mysql'
-  # Include MySQL recipes
-  include_recipe 'mysql::server'
-  include_recipe 'mysql::client'
-
-  # Create database with modern resource
-  mysql_database node['zabbix']['server']['database']['name'] do
-    host node['zabbix']['server']['database']['host']
-    user 'root'
-    password node['mysql']['server_root_password']
-    collation 'utf8_bin'
-    encoding 'utf8'
-    action :create
-  end
-
-  # Create user with modern resource
-  mysql_user node['zabbix']['server']['database']['user'] do
-    host '%'
-    password node['zabbix']['server']['database']['password']
-    action :create
-  end
-
-  # Grant privileges with modern resource
-  mysql_database_user node['zabbix']['server']['database']['user'] do
-    connection(
-      host: node['zabbix']['server']['database']['host'],
-      username: 'root',
-      password: node['mysql']['server_root_password']
-    )
-    password node['zabbix']['server']['database']['password']
-    database_name node['zabbix']['server']['database']['name']
-    host '%'
-    privileges [:all]
-    action :grant
-  end
-
-  # Import schema with more robust error handling
-  # NOTE: Using MYSQL_PWD environment variable for security (avoids password in process list)
-  ruby_block 'import_zabbix_mysql_schema' do
-    block do
-      # Find schema files
-      schema_file = Dir.glob('/usr/share/doc/zabbix-server-mysql*/schema.sql').first
-      images_file = Dir.glob('/usr/share/doc/zabbix-server-mysql*/images.sql').first
-      data_file = Dir.glob('/usr/share/doc/zabbix-server-mysql*/data.sql').first
-
-      if schema_file && images_file && data_file
-        # Set environment for mysql (secure - password not visible in process list)
-        env = { 'MYSQL_PWD' => node['zabbix']['server']['database']['password'] }
-        db_user = node['zabbix']['server']['database']['user']
-        db_host = node['zabbix']['server']['database']['host']
-        db_name = node['zabbix']['server']['database']['name']
-
-        # Check if schema already imported
-        cmd = Mixlib::ShellOut.new(
-          "mysql -u#{db_user} -h#{db_host} " \
-          "-e 'SELECT COUNT(*) FROM information_schema.tables " \
-          "WHERE table_schema=\"#{db_name}\" AND table_name=\"users\";'",
-          environment: env,
-          timeout: 60
-        )
-        cmd.run_command
-        tables_exist = cmd.stdout.strip.to_i > 0
-
-        if tables_exist
-          Chef::Log.info('Zabbix MySQL database schema already exists')
-        else
-          # Import schema
-          cmd = Mixlib::ShellOut.new(
-            "mysql -u#{db_user} -h#{db_host} #{db_name} < #{schema_file}",
-            environment: env,
-            timeout: 300
-          )
-          cmd.run_command
-          unless cmd.exitstatus.zero?
-            Chef::Log.error("Failed to import schema: #{cmd.stderr}")
-            raise 'Failed to import Zabbix MySQL schema'
-          end
-
-          # Import images
-          cmd = Mixlib::ShellOut.new(
-            "mysql -u#{db_user} -h#{db_host} #{db_name} < #{images_file}",
-            environment: env,
-            timeout: 300
-          )
-          cmd.run_command
-          unless cmd.exitstatus.zero?
-            Chef::Log.error("Failed to import images: #{cmd.stderr}")
-            raise 'Failed to import Zabbix MySQL images'
-          end
-
-          # Import data
-          cmd = Mixlib::ShellOut.new(
-            "mysql -u#{db_user} -h#{db_host} #{db_name} < #{data_file}",
-            environment: env,
-            timeout: 300
-          )
-          cmd.run_command
-          unless cmd.exitstatus.zero?
-            Chef::Log.error("Failed to import data: #{cmd.stderr}")
-            raise 'Failed to import Zabbix MySQL data'
-          end
-
-          Chef::Log.info('Zabbix MySQL database schema imported successfully')
-        end
-      else
-        Chef::Log.warn('Zabbix MySQL schema files not found')
-      end
+  # Install MariaDB server and client packages (MariaDB is the default
+  # drop-in replacement available on all supported platforms)
+  case node['platform_family']
+  when 'debian'
+    package %w(mariadb-server mariadb-client) do
+      action :install
     end
-    action :run
+  when 'rhel', 'amazon', 'fedora'
+    package %w(mariadb-server mariadb) do
+      action :install
+    end
+  end
+
+  mysql_service = 'mariadb'
+
+  # Enable and start MariaDB service
+  service mysql_service do
+    action [:enable, :start]
+  end
+
+  # Create Zabbix database
+  execute 'create_zabbix_mysql_database' do
+    command "mysql -e \"CREATE DATABASE IF NOT EXISTS #{db_name} CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;\""
     sensitive true
+  end
+
+  # Create Zabbix database user and grant privileges
+  execute 'create_zabbix_mysql_user' do
+    command <<-BASH
+      mysql -e "CREATE USER IF NOT EXISTS '#{db_user}'@'localhost' IDENTIFIED BY '#{db_password}';"
+      mysql -e "CREATE USER IF NOT EXISTS '#{db_user}'@'%' IDENTIFIED BY '#{db_password}';"
+      mysql -e "GRANT ALL PRIVILEGES ON #{db_name}.* TO '#{db_user}'@'localhost';"
+      mysql -e "GRANT ALL PRIVILEGES ON #{db_name}.* TO '#{db_user}'@'%';"
+      mysql -e "SET GLOBAL log_bin_trust_function_creators = 1;"
+      mysql -e "FLUSH PRIVILEGES;"
+    BASH
+    sensitive true
+  end
+
+  # Import Zabbix schema
+  execute 'import_zabbix_mysql_schema' do
+    command lazy {
+      schema_file = Dir.glob('/usr/share/doc/zabbix-server-mysql*/create.sql.gz').first ||
+                    Dir.glob('/usr/share/doc/zabbix-server-mysql*/schema.sql').first
+      if schema_file.nil?
+        'echo "No Zabbix schema file found, skipping import"'
+      elsif schema_file.end_with?('.gz')
+        "zcat #{schema_file} | mysql -u#{db_user} -h#{db_host} #{db_name}"
+      else
+        "mysql -u#{db_user} -h#{db_host} #{db_name} < #{schema_file}"
+      end
+    }
+    environment({ 'MYSQL_PWD' => db_password })
+    sensitive true
+    not_if "mysql -u#{db_user} -h#{db_host} -e \"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='#{db_name}' AND table_name='users'\" | grep -q '[1-9]'",
+           environment: { 'MYSQL_PWD' => db_password, 'PATH' => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin' }
     only_if 'test -f /usr/sbin/zabbix_server', environment: { 'PATH' => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin' }
+  end
+
+  # Import images and data (older Zabbix versions use separate files)
+  %w(images data).each do |file_type|
+    execute "import_zabbix_mysql_#{file_type}" do
+      command lazy {
+        sql_file = Dir.glob("/usr/share/doc/zabbix-server-mysql*/#{file_type}.sql").first
+        if sql_file.nil?
+          "echo 'No #{file_type}.sql found (may be combined in create.sql.gz), skipping'"
+        else
+          "mysql -u#{db_user} -h#{db_host} #{db_name} < #{sql_file}"
+        end
+      }
+      environment({ 'MYSQL_PWD' => db_password })
+      sensitive true
+      not_if "mysql -u#{db_user} -h#{db_host} -e \"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='#{db_name}' AND table_name='users'\" | grep -q '[1-9]'",
+             environment: { 'MYSQL_PWD' => db_password, 'PATH' => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin' }
+      only_if 'test -f /usr/sbin/zabbix_server', environment: { 'PATH' => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin' }
+    end
   end
 end
 
