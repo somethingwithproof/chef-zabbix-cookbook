@@ -50,7 +50,7 @@ jobs:
         path: coverage/
 
   agent-integration:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, chef]
     needs: lint
     timeout-minutes: 60
     strategy:
@@ -90,7 +90,7 @@ jobs:
         path: .kitchen/logs/
 
   server-postgresql-integration:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, chef]
     needs: lint
     timeout-minutes: 60
     strategy:
@@ -130,7 +130,7 @@ jobs:
         path: .kitchen/logs/
 
   server-mysql-integration:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, chef]
     needs: lint
     timeout-minutes: 60
     strategy:
