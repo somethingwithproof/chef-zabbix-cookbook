@@ -26,8 +26,8 @@ describe 'zabbix::repository' do
       expect(chef_run).to add_apt_repository('zabbix')
     end
 
-    it 'adds the zabbix-non-supported apt repository' do
-      expect(chef_run).to add_apt_repository('zabbix-non-supported')
+    it 'does not add non-supported apt repository for Zabbix 6.x+' do
+      expect(chef_run).not_to add_apt_repository('zabbix-non-supported')
     end
 
     it 'installs common dependencies' do
@@ -41,6 +41,10 @@ describe 'zabbix::repository' do
 
   context 'on CentOS 8' do
     platform 'centos', '8'
+
+    before do
+      stub_command('rpm -q net-snmp-devel').and_return(false)
+    end
 
     let(:chef_run) do
       runner = ChefSpec::SoloRunner.new(platform: 'centos', version: '8') do |node|
