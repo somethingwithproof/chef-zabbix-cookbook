@@ -50,9 +50,11 @@ when 'rhel', 'amazon', 'fedora'
   end
 
   # Install common dependencies
-  package %w(curl libcurl-devel net-snmp net-snmp-devel) do
-    flush_cache [:before]
-    action :install
+  # Use --allowerasing to handle curl-minimal conflict on minimal images
+  execute 'install-zabbix-rhel-deps' do
+    command 'dnf install -y --allowerasing curl libcurl-devel net-snmp net-snmp-devel'
+    action :run
+    not_if 'rpm -q net-snmp-devel'
   end
 
 when 'debian'
