@@ -74,16 +74,8 @@ when 'debian'
     action :add
   end
 
-  # Create a Zabbix non-supported repository
-  # Note: This repo may not exist for Zabbix 6.x+ which uses a unified repo
-  apt_repository 'zabbix-non-supported' do
-    uri "https://repo.zabbix.com/zabbix-non-supported/#{node['zabbix']['version']}/#{node['platform']}/"
-    components ['main']
-    key node['zabbix']['repository_key']
-    cache_rebuild true
-    ignore_failure true
-    action :add
-  end
+  # Zabbix 6.x+ uses unified repos; skip non-supported repo entirely
+  # as it causes apt-get update failures on modern versions
 
   # Update apt cache
   apt_update 'update' do
