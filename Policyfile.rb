@@ -20,8 +20,7 @@ cookbook 'zabbix', path: '.'
 # Dependencies
 cookbook 'apt'
 cookbook 'yum-epel'
-cookbook 'postgresql'
-cookbook 'mysql'
+# postgresql and mysql not needed - database.rb uses native packages
 cookbook 'apache2'
 cookbook 'nginx'
 cookbook 'selinux'
