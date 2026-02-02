@@ -8,8 +8,7 @@ cookbook 'zabbix', path: '../../'
 cookbook 'apt'
 cookbook 'yum-epel'
 cookbook 'build-essential'
-cookbook 'postgresql'
-cookbook 'mysql'
+# postgresql and mysql cookbooks not needed - database.rb installs packages directly
 cookbook 'apache2'
 cookbook 'nginx'
 

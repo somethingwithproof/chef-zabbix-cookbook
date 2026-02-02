@@ -2,7 +2,7 @@
 driver:
   name: dokken
   privileged: true
-  chef_version: latest # Use latest Chef 19
+  chef_version: "18"
   memory: 2048
   cpu: 2
   volumes:
