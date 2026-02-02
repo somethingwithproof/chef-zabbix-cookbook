@@ -80,6 +80,7 @@ describe 'zabbix::default' do
 
     before do
       stub_command('getenforce | grep -i disabled').and_return(false)
+      stub_command('rpm -q net-snmp-devel').and_return(false)
     end
 
     let(:chef_run) do
