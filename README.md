@@ -99,6 +99,29 @@ zabbix_web 'install' do
 end
 ```
 
+## Recipes
+
+### default
+Main recipe that orchestrates Zabbix installation. Installs all components based on node attributes including agent, server, web frontend, and database.
+
+### agent
+Installs and configures the Zabbix agent for monitoring. Configures connection to Zabbix server(s) and sets up agent configuration files.
+
+### server
+Installs and configures the Zabbix server component. Handles server configuration, database connection, and service management.
+
+### web
+Installs and configures the Zabbix web frontend. Supports both NGINX and Apache web servers with PHP-FPM integration.
+
+### database
+Installs and configures the database backend for Zabbix. Supports both PostgreSQL and MySQL/MariaDB with schema initialization.
+
+### repository
+Configures official Zabbix package repositories for the platform. Ensures the correct Zabbix version repository is available.
+
+### java_gateway
+Installs and configures the Zabbix Java Gateway for monitoring Java applications via JMX.
+
 ## Usage
 
 ### zabbix::default
@@ -145,9 +168,52 @@ include_recipe 'zabbix::database'
 
 This cookbook uses Test Kitchen for integration tests. You can run the tests using:
 
-```
+```bash
+# Run integration tests
 kitchen test
+
+# Run linting
+cookstyle
 ```
+
+## Development
+
+This cookbook uses a comprehensive testing and linting workflow:
+
+```bash
+# Install dependencies
+bundle install
+
+# Run unit tests (ChefSpec)
+chef exec rspec
+
+# Run integration tests (Test Kitchen)
+kitchen test
+
+# Run style checks (cookstyle)
+cookstyle
+
+# Test specific platforms
+kitchen test ubuntu-2204
+kitchen test debian-12
+```
+
+## Contributing
+
+1. Fork the repository on GitHub
+2. Create a feature branch (`git checkout -b feature/my-new-feature`)
+3. Write tests for your changes
+4. Make your changes
+5. Run the test suite to ensure all tests pass
+6. Commit your changes (`git commit -am 'Add new feature'`)
+7. Push to the branch (`git push origin feature/my-new-feature`)
+8. Create a Pull Request
+
+Please ensure:
+- All tests pass before submitting PR
+- Code follows Cookstyle guidelines
+- New features include appropriate tests
+- Documentation is updated for any new attributes or recipes
 
 ## License and Authors
 
