@@ -21,7 +21,7 @@ env:
 
 jobs:
   lint:
-    runs-on: [self-hosted, chef]
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
     - uses: actions/checkout@v6.0.2
@@ -50,7 +50,7 @@ jobs:
         path: coverage/
 
   agent-integration:
-    runs-on: [self-hosted, chef]
+    runs-on: ubuntu-latest
     needs: lint
     timeout-minutes: 60
     strategy:
@@ -90,7 +90,7 @@ jobs:
         path: .kitchen/logs/
 
   server-postgresql-integration:
-    runs-on: [self-hosted, chef]
+    runs-on: ubuntu-latest
     needs: lint
     timeout-minutes: 60
     strategy:
@@ -130,7 +130,7 @@ jobs:
         path: .kitchen/logs/
 
   server-mysql-integration:
-    runs-on: [self-hosted, chef]
+    runs-on: ubuntu-latest
     needs: lint
     timeout-minutes: 60
     strategy:
