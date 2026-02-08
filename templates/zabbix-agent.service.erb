@@ -5,7 +5,7 @@ After=network.target
 [Service]
 Environment="CONFFILE=/etc/zabbix/zabbix_agentd.conf"
 EnvironmentFile=-/etc/default/zabbix-agent
-Type=simple
+Type=forking
 Restart=on-failure
 PIDFile=/var/run/zabbix/zabbix_agentd.pid
 KillMode=control-group
