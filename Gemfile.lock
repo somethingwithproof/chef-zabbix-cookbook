@@ -445,8 +445,7 @@ GEM
       method_source (~> 1.0)
       reline (>= 0.6.0)
     pstore (0.1.4)
-    psych (5.3.1)
-      date
+    psych (4.0.6)
       stringio
     public_suffix (7.0.2)
     racc (1.8.1)
@@ -662,6 +661,7 @@ DEPENDENCIES
   inifile (~> 3.0)
   kitchen-dokken (~> 2.20)
   kitchen-inspec
+  psych (< 5)
   rake (~> 13.0)
   redcarpet
   rspec (~> 3.12.0)
