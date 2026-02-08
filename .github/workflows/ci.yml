@@ -82,6 +82,8 @@ jobs:
     - name: Test Kitchen - Agent
       run: |
         bundle exec kitchen test agent-${{ matrix.os }} --destroy=always
+      env:
+        CHEF_LICENSE: accept-no-persist
     - name: Upload kitchen logs on failure
       if: failure()
       uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -122,6 +124,8 @@ jobs:
     - name: Test Kitchen - PostgreSQL
       run: |
         bundle exec kitchen test server-postgresql-${{ matrix.os }} --destroy=always
+      env:
+        CHEF_LICENSE: accept-no-persist
     - name: Upload kitchen logs on failure
       if: failure()
       uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -162,6 +166,8 @@ jobs:
     - name: Test Kitchen - MySQL
       run: |
         bundle exec kitchen test server-mysql-${{ matrix.os }} --destroy=always
+      env:
+        CHEF_LICENSE: accept-no-persist
     - name: Upload kitchen logs on failure
       if: failure()
       uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
