@@ -11,11 +11,12 @@ transport:
 provisioner:
   name: dokken
   chef_license: accept
+  product_name: cinc
   enforce_idempotency: true
   multiple_converge: 2
   deprecations_as_errors: true
   log_level: info
-  retry_on_exit_code: 
+  retry_on_exit_code:
     - 35 # Service restart might cause temporary failures
   max_retries: 2
   wait_for_retry: 120
@@ -23,6 +24,7 @@ provisioner:
 verifier:
   name: inspec
   chef_license: accept-no-persist
+  product_name: cinc
   env_vars:
     CHEF_LICENSE: accept-no-persist
   sudo: true
