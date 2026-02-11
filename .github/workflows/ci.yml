@@ -24,7 +24,7 @@ jobs:
     runs-on: [self-hosted, chef]
     timeout-minutes: 15
     steps:
-    - uses: actions/checkout@v6.0.2
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
@@ -38,13 +38,13 @@ jobs:
       run: bundle exec rspec --format documentation --format RspecJunitFormatter --out rspec.xml
     - name: Upload test results
       if: always()
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       with:
         name: rspec-results
         path: rspec.xml
     - name: Upload coverage results
       if: always()
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       with:
         name: coverage-results
         path: coverage/
@@ -63,7 +63,7 @@ jobs:
       DOCKER_MEMORY: "2048m"
       DOCKER_CPUS: "2"
     steps:
-    - uses: actions/checkout@v6.0.2
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
@@ -84,7 +84,7 @@ jobs:
         bundle exec kitchen test agent-${{ matrix.os }} --destroy=always
     - name: Upload kitchen logs on failure
       if: failure()
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       with:
         name: kitchen-logs-agent-${{ matrix.os }}
         path: .kitchen/logs/
@@ -103,7 +103,7 @@ jobs:
       DOCKER_MEMORY: "3072m"
       DOCKER_CPUS: "2"
     steps:
-    - uses: actions/checkout@v6.0.2
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
@@ -124,7 +124,7 @@ jobs:
         bundle exec kitchen test server-postgresql-${{ matrix.os }} --destroy=always
     - name: Upload kitchen logs on failure
       if: failure()
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       with:
         name: kitchen-logs-postgresql-${{ matrix.os }}
         path: .kitchen/logs/
@@ -143,7 +143,7 @@ jobs:
       DOCKER_MEMORY: "3072m"
       DOCKER_CPUS: "2"
     steps:
-    - uses: actions/checkout@v6.0.2
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
@@ -164,7 +164,7 @@ jobs:
         bundle exec kitchen test server-mysql-${{ matrix.os }} --destroy=always
     - name: Upload kitchen logs on failure
       if: failure()
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       with:
         name: kitchen-logs-mysql-${{ matrix.os }}
         path: .kitchen/logs/
