@@ -25,6 +25,10 @@ jobs:
     timeout-minutes: 15
     steps:
     - uses: actions/checkout@v6.0.2
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libyaml-dev
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
@@ -64,6 +68,10 @@ jobs:
       DOCKER_CPUS: "2"
     steps:
     - uses: actions/checkout@v6.0.2
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libyaml-dev
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
@@ -104,6 +112,10 @@ jobs:
       DOCKER_CPUS: "2"
     steps:
     - uses: actions/checkout@v6.0.2
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libyaml-dev
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
@@ -144,6 +156,10 @@ jobs:
       DOCKER_CPUS: "2"
     steps:
     - uses: actions/checkout@v6.0.2
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libyaml-dev
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
