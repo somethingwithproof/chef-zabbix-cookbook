@@ -2,7 +2,6 @@
 
 unified_mode true
 
-resource_name :zabbix_server
 provides :zabbix_server
 
 description 'Use the zabbix_server resource to install and configure Zabbix server'

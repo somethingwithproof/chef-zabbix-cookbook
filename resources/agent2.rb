@@ -2,7 +2,6 @@
 
 unified_mode true
 
-resource_name :zabbix_agent2
 provides :zabbix_agent2
 
 description 'Use the zabbix_agent2 resource to install and configure Zabbix agent 2'

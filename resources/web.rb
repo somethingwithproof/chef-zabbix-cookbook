@@ -2,7 +2,6 @@
 
 unified_mode true
 
-resource_name :zabbix_web
 provides :zabbix_web
 
 description 'Use the zabbix_web resource to install and configure Zabbix web interface'
