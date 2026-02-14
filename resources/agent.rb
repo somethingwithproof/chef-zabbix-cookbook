@@ -235,6 +235,7 @@ action_class do
       owner 'root'
       group 'root'
       mode '0640'
+      sensitive true
       variables(
         servers: new_resource.servers.join(','),
         servers_active: new_resource.servers_active.join(','),

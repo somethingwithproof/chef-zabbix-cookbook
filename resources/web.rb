@@ -222,6 +222,7 @@ action_class do
               'nginx'
             end
       mode '0640'
+      sensitive true
       variables(
         db_type: new_resource.database_type,
         db_host: new_resource.database_host,
