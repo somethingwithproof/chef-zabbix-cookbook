@@ -2,7 +2,6 @@
 
 unified_mode true
 
-resource_name :zabbix_proxy
 provides :zabbix_proxy
 
 description 'Use the zabbix_proxy resource to install and configure Zabbix proxy'
