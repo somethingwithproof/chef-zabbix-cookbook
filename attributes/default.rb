@@ -47,7 +47,10 @@ default['zabbix']['agent']['config_file'] = '/etc/zabbix/zabbix_agentd.conf'
 default['zabbix']['agent']['pid_file'] = '/var/run/zabbix/zabbix_agentd.pid'
 default['zabbix']['agent']['log_file'] = '/var/log/zabbix/zabbix_agentd.log'
 default['zabbix']['agent']['log_level'] = 3
-default['zabbix']['agent']['enable_remote_commands'] = 1
+# SECURITY: Remote command execution is disabled by default.
+# Enabling this allows the Zabbix server to execute arbitrary commands on the agent.
+# Only enable if absolutely necessary and ensure proper network segmentation.
+default['zabbix']['agent']['enable_remote_commands'] = 0
 default['zabbix']['agent']['listen_port'] = 10050
 default['zabbix']['agent']['timeout'] = 30
 default['zabbix']['agent']['tls_connect'] = 'unencrypted'
@@ -95,7 +98,9 @@ default['zabbix']['server']['database']['host'] = '127.0.0.1'
 default['zabbix']['server']['database']['port'] = 5432
 default['zabbix']['server']['database']['name'] = 'zabbix'
 default['zabbix']['server']['database']['user'] = 'zabbix'
-default['zabbix']['server']['database']['password'] = 'zabbix'
+# SECURITY: Database password must be set explicitly via node attributes or environment.
+# Setting a hardcoded default password is a security risk.
+default['zabbix']['server']['database']['password'] = ''
 default['zabbix']['server']['database']['schema'] = nil
 default['zabbix']['server']['database']['socket'] = nil
 default['zabbix']['server']['database']['encryption'] = 0

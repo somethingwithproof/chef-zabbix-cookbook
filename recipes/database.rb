@@ -30,6 +30,9 @@ db_user = node['zabbix']['server']['database']['user']
 db_password = node['zabbix']['server']['database']['password']
 db_host = node['zabbix']['server']['database']['host']
 
+# Validate that database password is set
+raise 'Database password must be explicitly set via node["zabbix"]["server"]["database"]["password"]. Do not use the default value.' if db_password.nil? || db_password.empty?
+
 case db_type
 when 'postgresql'
   # Install PostgreSQL server and client packages
