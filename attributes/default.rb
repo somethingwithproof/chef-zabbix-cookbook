@@ -138,9 +138,19 @@ default['zabbix']['java_gateway']['start_pollers'] = 5
 default['zabbix']['java_gateway']['timeout'] = 3
 
 # Platform specific attributes
+#
+# Amazon Linux maps to RHEL-compatible Zabbix repos:
+#   Amazon Linux 2023+ -> RHEL 9
+#   Amazon Linux 2     -> RHEL 7
+#
 case node['platform_family']
 when 'rhel', 'amazon'
-  default['zabbix']['repository_uri'] = "https://repo.zabbix.com/zabbix/#{node['zabbix']['version']}/rhel/#{node['platform_version'].to_i}/$basearch/"
+  rhel_version = if platform?('amazon')
+                   node['platform_version'].to_i >= 2023 ? 9 : 7
+                 else
+                   node['platform_version'].to_i
+                 end
+  default['zabbix']['repository_uri'] = "https://repo.zabbix.com/zabbix/#{node['zabbix']['version']}/rhel/#{rhel_version}/$basearch/"
   default['zabbix']['repository_key'] = 'https://repo.zabbix.com/RPM-GPG-KEY-ZABBIX-A14FE591'
 when 'debian'
   default['zabbix']['repository_uri'] = "https://repo.zabbix.com/zabbix/#{node['zabbix']['version']}/#{node['platform']}/pool/main/z/zabbix"

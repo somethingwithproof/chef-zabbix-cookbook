@@ -48,19 +48,12 @@ DebugLevel=<%= @log_level %>
 #
 # SourceIP=
 
-### Option: EnableRemoteCommands
-#	Whether remote commands from Zabbix server are allowed.
-#	0 - not allowed
-#	1 - allowed
+### Option: AllowKey / DenyKey
+#	Allow/deny execution of item keys matching pattern.
+#	Replaces deprecated EnableRemoteCommands (removed in Zabbix 6.4+)
+#	AllowKey=system.run[*] is equivalent to EnableRemoteCommands=1
 #
-EnableRemoteCommands=<%= @enable_remote_commands %>
-
-### Option: LogRemoteCommands
-#	Enable logging of executed shell commands as warnings.
-#	0 - disabled
-#	1 - enabled
-#
-LogRemoteCommands=1
+<% if @enable_remote_commands.to_i == 1 %>AllowKey=system.run[*]<% else %>DenyKey=system.run[*]<% end %>
 
 ### Option: Server
 #	List of comma delimited IP addresses, optionally in CIDR notation, or DNS names of Zabbix servers and Zabbix proxies.
@@ -103,13 +96,14 @@ ServerActive=<%= @servers_active %>
 #	Unique, case sensitive hostname.
 #	Required for active checks and must match hostname as configured on the server.
 #
-Hostname=<%= @hostname %>
+<% if @hostname && !@hostname.to_s.empty? %>Hostname=<%= @hostname %><% else %># Hostname not set - using HostnameItem fallback
+HostnameItem=system.hostname<% end %>
 
 ### Option: HostnameItem
 #	Item used for generating Hostname if it is unclear.
 #	Ignored if Hostname is defined.
 #
-# HostnameItem=system.hostname
+<% unless @hostname && !@hostname.to_s.empty? %>HostnameItem=system.hostname<% end %>
 
 ### Option: HostMetadata
 #	Optional parameter that defines host metadata.

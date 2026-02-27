@@ -22,4 +22,4 @@ depends 'apt', '>= 7.0'
 # postgresql and mysql cookbooks not used - database.rb installs packages directly
 depends 'nginx', '>= 12.0'
 depends 'apache2', '>= 9.0'
-depends 'selinux', '>= 6.0'
+depends 'selinux', '>= 6.1'
