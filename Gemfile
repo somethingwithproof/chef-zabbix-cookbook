@@ -9,7 +9,7 @@ gem 'psych', '< 5'
 
 group :development do
   gem 'chefspec', '~> 9.3'
-  gem 'cookstyle', '~> 8.1'
+  gem 'cookstyle', '~> 8.6'
   # Use inspec-core (not inspec) to avoid commercial chef-licensing requirement in InSpec 7+
   gem 'inspec-core', '~> 7.0'
   gem 'kitchen-dokken', '~> 2.20'
