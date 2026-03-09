@@ -5,7 +5,7 @@ gem 'chef-cli', '~> 5.6'
 gem 'berkshelf', '>= 8.0'
 
 # Pin psych to avoid compilation issues with Ruby 3.2+
-gem 'psych', '< 5'
+gem 'psych', '< 6'
 
 group :development do
   gem 'chefspec', '~> 9.3'
